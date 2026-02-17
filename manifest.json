@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "GLOBIS DB Auto Expand (Unliked Only)",
+  "name": "GLOBIS マイページ投稿拡張",
   "version": "0.1.0",
   "description": "Expands discussion posts that you have not liked yet.",
   "content_scripts": [
