@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "GLOBIS DB Auto Expand (Unliked Only)",
+  "version": "0.1.0",
+  "description": "Expands discussion posts that you have not liked yet.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://vc.globis.ac.jp/my/*"
+      ],
+      "js": [
+        "shared.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
