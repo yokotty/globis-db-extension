@@ -92,12 +92,13 @@ test("expandContentElement: no-op when clamp class does not exist", () => {
 });
 
 test("collapseContentElement: adds clamp class back", () => {
-  const content = makeContent({ classes: ["editor-content"] });
+  const content = makeContent({ classes: ["editor-content", "line-clamp-none"] });
   content.removeAttribute = () => {};
   const changed = collapseContentElement(content);
 
   assert.equal(changed, true);
   assert.equal(content.classList.contains("line-clamp-3"), true);
+  assert.equal(content.classList.contains("line-clamp-none"), false);
   assert.deepEqual(content.getRemovedStyles(), [
     "-webkit-line-clamp",
     "overflow",

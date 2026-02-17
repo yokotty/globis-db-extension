@@ -15,7 +15,7 @@
   function getLikeChip(postEl) {
     const section = getMainSection(postEl);
     if (section) {
-      const sectionChip = section.querySelector(LIKE_CHIP_SELECTOR);
+      const sectionChip = section.querySelector(`:scope > ${LIKE_CHIP_SELECTOR}`);
       if (sectionChip) return sectionChip;
     }
     return postEl.querySelector(LIKE_CHIP_SELECTOR);
@@ -78,70 +78,26 @@
     }
   });
 
-  function shouldSyncByRequest(url, method) {
-    if (typeof url !== "string" || typeof method !== "string") return false;
-    const normalizedMethod = method.toUpperCase();
-    if (normalizedMethod === "GET" || normalizedMethod === "HEAD" || normalizedMethod === "OPTIONS") {
-      return false;
-    }
-    return /\/api\//.test(url) || /\/my\//.test(url);
-  }
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
 
-  function installNetworkHooks() {
-    if (globalThis.__vcLikeSyncHookInstalled) return;
-    globalThis.__vcLikeSyncHookInstalled = true;
+    const chip = target.closest(LIKE_CHIP_SELECTOR);
+    if (!chip) return;
 
-    if (typeof fetch === "function") {
-      const originalFetch = fetch;
-      globalThis.fetch = async function (...args) {
-        let url = "";
-        let method = "GET";
+    // Only react to the main post's like chip, not comment chips.
+    const postEl = chip.closest(POST_SELECTOR);
+    if (!postEl) return;
+    const mainChip = getLikeChip(postEl);
+    if (mainChip !== chip) return;
 
-        const input = args[0];
-        const init = args[1];
+    scheduleProcess();
+    setTimeout(scheduleProcess, 60);
+    setTimeout(scheduleProcess, 180);
+    setTimeout(scheduleProcess, 400);
+    setTimeout(scheduleProcess, 800);
+  }, true);
 
-        if (typeof input === "string") {
-          url = input;
-        } else if (input && typeof input.url === "string") {
-          url = input.url;
-          if (input.method) method = String(input.method);
-        }
-        if (init && init.method) method = String(init.method);
-
-        const response = await originalFetch.apply(this, args);
-        if (shouldSyncByRequest(url, method)) {
-          scheduleProcess();
-          setTimeout(scheduleProcess, 80);
-          setTimeout(scheduleProcess, 250);
-        }
-        return response;
-      };
-    }
-
-    if (typeof XMLHttpRequest !== "undefined") {
-      const originalOpen = XMLHttpRequest.prototype.open;
-      const originalSend = XMLHttpRequest.prototype.send;
-
-      XMLHttpRequest.prototype.open = function (method, url, ...rest) {
-        this.__vcMethod = typeof method === "string" ? method : "GET";
-        this.__vcUrl = typeof url === "string" ? url : "";
-        return originalOpen.call(this, method, url, ...rest);
-      };
-
-      XMLHttpRequest.prototype.send = function (...args) {
-        this.addEventListener("loadend", () => {
-          if (shouldSyncByRequest(this.__vcUrl, this.__vcMethod || "GET")) {
-            scheduleProcess();
-            setTimeout(scheduleProcess, 80);
-            setTimeout(scheduleProcess, 250);
-          }
-        }, { once: true });
-        return originalSend.apply(this, args);
-      };
-    }
-  }
-
-  installNetworkHooks();
   processAllPosts();
   observer.observe(document.documentElement, {
     childList: true,

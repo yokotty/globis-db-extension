@@ -47,8 +47,11 @@
 
   function collapseContentElement(contentEl) {
     if (!contentEl || !contentEl.classList) return false;
-    if (contentEl.classList.contains("line-clamp-3")) return false;
+    if (contentEl.classList.contains("line-clamp-3") && !contentEl.classList.contains("line-clamp-none")) {
+      return false;
+    }
 
+    contentEl.classList.remove("line-clamp-none");
     contentEl.classList.add("line-clamp-3");
     if (typeof contentEl.removeAttribute === "function") {
       contentEl.removeAttribute("data-vc-expanded");
