@@ -2,7 +2,8 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
   parseLikeState,
-  expandContentElement
+  expandContentElement,
+  collapseContentElement
 } = require("./shared.js");
 
 function makeClassList(initial = []) {
@@ -85,6 +86,29 @@ test("expandContentElement: removes clamp class and inline styles", () => {
 test("expandContentElement: no-op when clamp class does not exist", () => {
   const content = makeContent({ classes: ["editor-content"] });
   const changed = expandContentElement(content);
+
+  assert.equal(changed, false);
+  assert.deepEqual(content.getRemovedStyles(), []);
+});
+
+test("collapseContentElement: adds clamp class back", () => {
+  const content = makeContent({ classes: ["editor-content"] });
+  content.removeAttribute = () => {};
+  const changed = collapseContentElement(content);
+
+  assert.equal(changed, true);
+  assert.equal(content.classList.contains("line-clamp-3"), true);
+  assert.deepEqual(content.getRemovedStyles(), [
+    "-webkit-line-clamp",
+    "overflow",
+    "display",
+    "-webkit-box-orient"
+  ]);
+});
+
+test("collapseContentElement: no-op when already clamped", () => {
+  const content = makeContent({ classes: ["editor-content", "line-clamp-3"] });
+  const changed = collapseContentElement(content);
 
   assert.equal(changed, false);
   assert.deepEqual(content.getRemovedStyles(), []);

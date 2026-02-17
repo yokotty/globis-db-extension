@@ -45,8 +45,26 @@
     return true;
   }
 
+  function collapseContentElement(contentEl) {
+    if (!contentEl || !contentEl.classList) return false;
+    if (contentEl.classList.contains("line-clamp-3")) return false;
+
+    contentEl.classList.add("line-clamp-3");
+    if (typeof contentEl.removeAttribute === "function") {
+      contentEl.removeAttribute("data-vc-expanded");
+    }
+    if (contentEl.style && typeof contentEl.style.removeProperty === "function") {
+      contentEl.style.removeProperty("-webkit-line-clamp");
+      contentEl.style.removeProperty("overflow");
+      contentEl.style.removeProperty("display");
+      contentEl.style.removeProperty("-webkit-box-orient");
+    }
+    return true;
+  }
+
   return {
     parseLikeState,
-    expandContentElement
+    expandContentElement,
+    collapseContentElement
   };
 });
