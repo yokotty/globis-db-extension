@@ -5,6 +5,10 @@
   const POST_SELECTOR = "div.relative.rounded-t-3xl.bg-white";
   const LIKE_CHIP_SELECTOR = "div.relative.rounded-full.h-6.w-fit.cursor-pointer";
   const MORE_BUTTON_SELECTOR = ".flex.justify-end.mr-3 > button";
+  const LAYOUT_TITLE_SELECTOR = "#layout-title";
+  const TABS_SELECTOR = "#tabs";
+  const DISCUSSION_TOOLBAR_SELECTOR = "div.flex.justify-between.md\\:py-6.relative";
+  const HEADER_NAV_SELECTOR = "#header-desktop-nav";
 
   function isMoreButton(buttonEl) {
     if (!buttonEl || typeof buttonEl.textContent !== "string") return false;
@@ -80,6 +84,38 @@
     return clicked;
   }
 
+  function adjustLayoutTitleHeight() {
+    const titleEl = document.querySelector(LAYOUT_TITLE_SELECTOR);
+    if (!titleEl) return;
+
+    titleEl.classList.remove("h-[48px]", "md:h-[64px]");
+    titleEl.classList.add("h-[40px]", "md:h-[60px]");
+  }
+
+  function adjustTabsHeight() {
+    const tabsEl = document.querySelector(TABS_SELECTOR);
+    if (!tabsEl) return;
+
+    tabsEl.classList.remove("md:h-[52px]");
+    tabsEl.classList.add("md:h-[42px]");
+  }
+
+  function adjustDiscussionToolbarPadding() {
+    const toolbarEls = document.querySelectorAll(DISCUSSION_TOOLBAR_SELECTOR);
+    for (const toolbarEl of toolbarEls) {
+      toolbarEl.classList.remove("md:py-6");
+      toolbarEl.classList.add("md:py-3");
+    }
+  }
+
+  function adjustHeaderNavPadding() {
+    const navEl = document.querySelector(HEADER_NAV_SELECTOR);
+    if (!navEl) return;
+
+    navEl.classList.remove("py-[7px]");
+    navEl.classList.add("py-[1px]");
+  }
+
   let scheduled = false;
   function scheduleExpand() {
     if (scheduled) return;
@@ -97,6 +133,10 @@
   const observer = new MutationObserver((mutations) => {
     for (const m of mutations) {
       if (m.type === "childList") {
+        adjustLayoutTitleHeight();
+        adjustTabsHeight();
+        adjustDiscussionToolbarPadding();
+        adjustHeaderNavPadding();
         scheduleExpand();
         return;
       }
@@ -140,6 +180,14 @@
   }, true);
 
   // 初期表示後、少し待ってから more を押して全文表示する
+  adjustLayoutTitleHeight();
+  adjustTabsHeight();
+  adjustDiscussionToolbarPadding();
+  adjustHeaderNavPadding();
+  setTimeout(adjustLayoutTitleHeight, 300);
+  setTimeout(adjustTabsHeight, 300);
+  setTimeout(adjustDiscussionToolbarPadding, 300);
+  setTimeout(adjustHeaderNavPadding, 300);
   setTimeout(scheduleExpand, 900);
   setTimeout(scheduleExpand, 1500);
 
