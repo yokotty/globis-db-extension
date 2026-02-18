@@ -65,9 +65,48 @@
     return true;
   }
 
+  function updateToggleButton(buttonEl, isExpanded) {
+    if (!buttonEl || typeof buttonEl.textContent !== "string") return false;
+
+    const text = buttonEl.textContent;
+    if (!text.includes("more") && !text.includes("閉じる")) return false;
+
+    buttonEl.textContent = isExpanded ? "閉じる" : "more";
+
+    const parent = buttonEl.parentElement;
+    if (parent && parent.style && typeof parent.style.removeProperty === "function") {
+      parent.style.removeProperty("display");
+    }
+
+    return true;
+  }
+
+  function isMoreLabel(text) {
+    if (typeof text !== "string") return false;
+    return text.trim().toLowerCase() === "more";
+  }
+
+  function isCloseLabel(text) {
+    if (typeof text !== "string") return false;
+    return text.trim() === "閉じる";
+  }
+
+  function shouldAutoClickMore(likeState) {
+    return likeState === "unliked";
+  }
+
+  function shouldAutoCollapseOnLike(likeState) {
+    return likeState === "liked";
+  }
+
   return {
     parseLikeState,
     expandContentElement,
-    collapseContentElement
+    collapseContentElement,
+    updateToggleButton,
+    isMoreLabel,
+    isCloseLabel,
+    shouldAutoClickMore,
+    shouldAutoCollapseOnLike
   };
 });

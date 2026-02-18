@@ -3,7 +3,12 @@ const assert = require("node:assert/strict");
 const {
   parseLikeState,
   expandContentElement,
-  collapseContentElement
+  collapseContentElement,
+  updateToggleButton,
+  isMoreLabel,
+  isCloseLabel,
+  shouldAutoClickMore,
+  shouldAutoCollapseOnLike
 } = require("./shared.js");
 
 function makeClassList(initial = []) {
@@ -125,4 +130,60 @@ test("parseLikeState: liked when icon path matches liked thumb", () => {
     return null;
   };
   assert.equal(parseLikeState(chip), "liked");
+});
+
+test("updateToggleButton: sets label to 閉じる and restores display", () => {
+  const removed = [];
+  const parent = {
+    style: {
+      removeProperty(name) {
+        removed.push(name);
+      }
+    }
+  };
+  const btn = {
+    textContent: "more",
+    parentElement: parent
+  };
+
+  const changed = updateToggleButton(btn, true);
+  assert.equal(changed, true);
+  assert.equal(btn.textContent, "閉じる");
+  assert.deepEqual(removed, ["display"]);
+});
+
+test("updateToggleButton: ignores non-toggle labels", () => {
+  const btn = {
+    textContent: "プロフィールを確認",
+    parentElement: null
+  };
+
+  const changed = updateToggleButton(btn, true);
+  assert.equal(changed, false);
+  assert.equal(btn.textContent, "プロフィールを確認");
+});
+
+test("isMoreLabel: true only for exact more label", () => {
+  assert.equal(isMoreLabel("more"), true);
+  assert.equal(isMoreLabel(" more "), true);
+  assert.equal(isMoreLabel("閉じる"), false);
+  assert.equal(isMoreLabel("more!"), false);
+});
+
+test("shouldAutoClickMore: true only for unliked state", () => {
+  assert.equal(shouldAutoClickMore("unliked"), true);
+  assert.equal(shouldAutoClickMore("liked"), false);
+  assert.equal(shouldAutoClickMore(""), false);
+});
+
+test("isCloseLabel: true only for 閉じる", () => {
+  assert.equal(isCloseLabel("閉じる"), true);
+  assert.equal(isCloseLabel(" 閉じる "), true);
+  assert.equal(isCloseLabel("more"), false);
+});
+
+test("shouldAutoCollapseOnLike: true only for liked state", () => {
+  assert.equal(shouldAutoCollapseOnLike("liked"), true);
+  assert.equal(shouldAutoCollapseOnLike("unliked"), false);
+  assert.equal(shouldAutoCollapseOnLike(""), false);
 });
