@@ -31,56 +31,6 @@
     return "unliked";
   }
 
-  function expandContentElement(contentEl) {
-    if (!contentEl || !contentEl.classList) return false;
-    if (!contentEl.classList.contains("line-clamp-3")) return false;
-
-    contentEl.classList.remove("line-clamp-3");
-    if (contentEl.style && typeof contentEl.style.removeProperty === "function") {
-      contentEl.style.removeProperty("-webkit-line-clamp");
-      contentEl.style.removeProperty("overflow");
-      contentEl.style.removeProperty("display");
-      contentEl.style.removeProperty("-webkit-box-orient");
-    }
-    return true;
-  }
-
-  function collapseContentElement(contentEl) {
-    if (!contentEl || !contentEl.classList) return false;
-    if (contentEl.classList.contains("line-clamp-3") && !contentEl.classList.contains("line-clamp-none")) {
-      return false;
-    }
-
-    contentEl.classList.remove("line-clamp-none");
-    contentEl.classList.add("line-clamp-3");
-    if (typeof contentEl.removeAttribute === "function") {
-      contentEl.removeAttribute("data-vc-expanded");
-    }
-    if (contentEl.style && typeof contentEl.style.removeProperty === "function") {
-      contentEl.style.removeProperty("-webkit-line-clamp");
-      contentEl.style.removeProperty("overflow");
-      contentEl.style.removeProperty("display");
-      contentEl.style.removeProperty("-webkit-box-orient");
-    }
-    return true;
-  }
-
-  function updateToggleButton(buttonEl, isExpanded) {
-    if (!buttonEl || typeof buttonEl.textContent !== "string") return false;
-
-    const text = buttonEl.textContent;
-    if (!text.includes("more") && !text.includes("閉じる")) return false;
-
-    buttonEl.textContent = isExpanded ? "閉じる" : "more";
-
-    const parent = buttonEl.parentElement;
-    if (parent && parent.style && typeof parent.style.removeProperty === "function") {
-      parent.style.removeProperty("display");
-    }
-
-    return true;
-  }
-
   function isMoreLabel(text) {
     if (typeof text !== "string") return false;
     return text.trim().toLowerCase() === "more";
@@ -101,9 +51,6 @@
 
   return {
     parseLikeState,
-    expandContentElement,
-    collapseContentElement,
-    updateToggleButton,
     isMoreLabel,
     isCloseLabel,
     shouldAutoClickMore,

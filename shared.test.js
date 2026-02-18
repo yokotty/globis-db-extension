@@ -2,9 +2,6 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
   parseLikeState,
-  expandContentElement,
-  collapseContentElement,
-  updateToggleButton,
   isMoreLabel,
   isCloseLabel,
   shouldAutoClickMore,
@@ -39,21 +36,6 @@ function makeChip({ classes = [], countText = "" } = {}) {
   };
 }
 
-function makeContent({ classes = [] } = {}) {
-  const removed = [];
-  return {
-    classList: makeClassList(classes),
-    style: {
-      removeProperty(name) {
-        removed.push(name);
-      }
-    },
-    getRemovedStyles() {
-      return removed;
-    }
-  };
-}
-
 test("parseLikeState: liked when bg-primary2 exists", () => {
   const chip = makeChip({ classes: ["bg-primary2"], countText: "+" });
   assert.equal(parseLikeState(chip), "liked");
@@ -74,52 +56,6 @@ test("parseLikeState: liked when count is numeric and no color hint", () => {
   assert.equal(parseLikeState(chip), "liked");
 });
 
-test("expandContentElement: removes clamp class and inline styles", () => {
-  const content = makeContent({ classes: ["editor-content", "line-clamp-3"] });
-  const changed = expandContentElement(content);
-
-  assert.equal(changed, true);
-  assert.equal(content.classList.contains("line-clamp-3"), false);
-  assert.deepEqual(content.getRemovedStyles(), [
-    "-webkit-line-clamp",
-    "overflow",
-    "display",
-    "-webkit-box-orient"
-  ]);
-});
-
-test("expandContentElement: no-op when clamp class does not exist", () => {
-  const content = makeContent({ classes: ["editor-content"] });
-  const changed = expandContentElement(content);
-
-  assert.equal(changed, false);
-  assert.deepEqual(content.getRemovedStyles(), []);
-});
-
-test("collapseContentElement: adds clamp class back", () => {
-  const content = makeContent({ classes: ["editor-content", "line-clamp-none"] });
-  content.removeAttribute = () => {};
-  const changed = collapseContentElement(content);
-
-  assert.equal(changed, true);
-  assert.equal(content.classList.contains("line-clamp-3"), true);
-  assert.equal(content.classList.contains("line-clamp-none"), false);
-  assert.deepEqual(content.getRemovedStyles(), [
-    "-webkit-line-clamp",
-    "overflow",
-    "display",
-    "-webkit-box-orient"
-  ]);
-});
-
-test("collapseContentElement: no-op when already clamped", () => {
-  const content = makeContent({ classes: ["editor-content", "line-clamp-3"] });
-  const changed = collapseContentElement(content);
-
-  assert.equal(changed, false);
-  assert.deepEqual(content.getRemovedStyles(), []);
-});
-
 test("parseLikeState: liked when icon path matches liked thumb", () => {
   const chip = makeChip({ classes: ["foo"], countText: "" });
   chip.querySelector = (selector) => {
@@ -130,37 +66,6 @@ test("parseLikeState: liked when icon path matches liked thumb", () => {
     return null;
   };
   assert.equal(parseLikeState(chip), "liked");
-});
-
-test("updateToggleButton: sets label to 閉じる and restores display", () => {
-  const removed = [];
-  const parent = {
-    style: {
-      removeProperty(name) {
-        removed.push(name);
-      }
-    }
-  };
-  const btn = {
-    textContent: "more",
-    parentElement: parent
-  };
-
-  const changed = updateToggleButton(btn, true);
-  assert.equal(changed, true);
-  assert.equal(btn.textContent, "閉じる");
-  assert.deepEqual(removed, ["display"]);
-});
-
-test("updateToggleButton: ignores non-toggle labels", () => {
-  const btn = {
-    textContent: "プロフィールを確認",
-    parentElement: null
-  };
-
-  const changed = updateToggleButton(btn, true);
-  assert.equal(changed, false);
-  assert.equal(btn.textContent, "プロフィールを確認");
 });
 
 test("isMoreLabel: true only for exact more label", () => {
