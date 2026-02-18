@@ -5,7 +5,9 @@ const {
   isMoreLabel,
   isCloseLabel,
   shouldAutoClickMore,
-  shouldAutoCollapseOnLike
+  shouldAutoCollapseOnLike,
+  shouldTriggerMoreClick,
+  shouldTriggerCloseClick
 } = require("./shared.js");
 
 function makeClassList(initial = []) {
@@ -91,4 +93,16 @@ test("shouldAutoCollapseOnLike: true only for liked state", () => {
   assert.equal(shouldAutoCollapseOnLike("liked"), true);
   assert.equal(shouldAutoCollapseOnLike("unliked"), false);
   assert.equal(shouldAutoCollapseOnLike(""), false);
+});
+
+test("shouldTriggerMoreClick: unliked + more only", () => {
+  assert.equal(shouldTriggerMoreClick("unliked", "more"), true);
+  assert.equal(shouldTriggerMoreClick("liked", "more"), false);
+  assert.equal(shouldTriggerMoreClick("unliked", "閉じる"), false);
+});
+
+test("shouldTriggerCloseClick: liked + 閉じる only", () => {
+  assert.equal(shouldTriggerCloseClick("liked", "閉じる"), true);
+  assert.equal(shouldTriggerCloseClick("unliked", "閉じる"), false);
+  assert.equal(shouldTriggerCloseClick("liked", "more"), false);
 });

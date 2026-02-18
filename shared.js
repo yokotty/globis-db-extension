@@ -49,11 +49,21 @@
     return likeState === "liked";
   }
 
+  function shouldTriggerMoreClick(likeState, labelText) {
+    return shouldAutoClickMore(likeState) && isMoreLabel(labelText);
+  }
+
+  function shouldTriggerCloseClick(likeState, labelText) {
+    return shouldAutoCollapseOnLike(likeState) && isCloseLabel(labelText);
+  }
+
   return {
     parseLikeState,
     isMoreLabel,
     isCloseLabel,
     shouldAutoClickMore,
-    shouldAutoCollapseOnLike
+    shouldAutoCollapseOnLike,
+    shouldTriggerMoreClick,
+    shouldTriggerCloseClick
   };
 });
