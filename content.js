@@ -1,6 +1,10 @@
 (() => {
   "use strict";
 
+  // Apply on discussion pages (/my/cm/*), except mentions/reactions (/my/cm/740*).
+  if (!/^\/my\/cm(\/|$)/.test(location.pathname)) return;
+  if (/^\/my\/cm\/740(\/|$)/.test(location.pathname)) return;
+
   const logic = globalThis.GlobisDbLogic;
   const POST_SELECTOR = "div.relative.rounded-t-3xl.bg-white";
   const LIKE_CHIP_SELECTOR = "div.relative.rounded-full.h-6.w-fit.cursor-pointer";
