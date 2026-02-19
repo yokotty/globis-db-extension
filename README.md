@@ -49,3 +49,6 @@ GLOBIS VC マイページのディスカッション投稿で、
 
 **Permissions**
 - 追加の権限は不要（content script のみ）
+
+**Privacy Policy**
+- `PRIVACY.md`
