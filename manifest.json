@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GLOBIS マイページ投稿拡張",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Expands discussion posts that you have not liked yet.",
   "content_scripts": [
     {

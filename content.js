@@ -68,6 +68,14 @@
     const TABS_SELECTOR = "#tabs";
     const DISCUSSION_TOOLBAR_SELECTOR = "div.flex.justify-between.md\\:py-6.relative";
     const HEADER_NAV_SELECTOR = "#header-desktop-nav";
+    const CURRENT_USER_NAME_SELECTOR = "aside.menu .text-sm.break-words";
+
+    function getCurrentUserName() {
+      const nameEl = document.querySelector(CURRENT_USER_NAME_SELECTOR);
+      return nameEl && typeof nameEl.textContent === "string"
+        ? nameEl.textContent.trim()
+        : "";
+    }
 
     function isMoreButton(buttonEl) {
       if (!buttonEl || typeof buttonEl.textContent !== "string") return false;
@@ -79,6 +87,25 @@
 
     function getMainSection(postEl) {
       return postEl.querySelector(":scope > .text-black2.grid.grid-cols-1");
+    }
+
+    function getPostAuthorName(postEl) {
+      const section = getMainSection(postEl);
+      if (!section) return "";
+
+      const preferredNameEl = section.querySelector(
+        ":scope > div:first-child div.font-bold.text-\\[13px\\].md\\:text-\\[11px\\]"
+      );
+      if (preferredNameEl && typeof preferredNameEl.textContent === "string") {
+        return preferredNameEl.textContent.trim();
+      }
+
+      const fallbackNameEl = section.querySelector(
+        ":scope > div:first-child span.text-\\[13px\\].font-bold"
+      );
+      return fallbackNameEl && typeof fallbackNameEl.textContent === "string"
+        ? fallbackNameEl.textContent.trim()
+        : "";
     }
 
     function getLikeChip(postEl) {
@@ -95,6 +122,11 @@
       if (!chip) return true;
       if (!logic || typeof logic.parseLikeState !== "function") return true;
       const likeState = logic.parseLikeState(chip);
+      const authorName = getPostAuthorName(postEl);
+      const currentUserName = getCurrentUserName();
+      if (typeof logic.shouldAutoExpandPost === "function") {
+        return logic.shouldAutoExpandPost(likeState, authorName, currentUserName);
+      }
       if (typeof logic.shouldAutoClickMore === "function") {
         return logic.shouldAutoClickMore(likeState);
       }

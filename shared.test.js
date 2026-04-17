@@ -6,6 +6,9 @@ const {
   isCloseLabel,
   shouldAutoClickMore,
   shouldAutoCollapseOnLike,
+  normalizeDisplayName,
+  isOwnPost,
+  shouldAutoExpandPost,
   shouldTriggerMoreClick,
   shouldTriggerCloseClick
 } = require("./shared.js");
@@ -81,6 +84,23 @@ test("shouldAutoClickMore: true only for unliked state", () => {
   assert.equal(shouldAutoClickMore("unliked"), true);
   assert.equal(shouldAutoClickMore("liked"), false);
   assert.equal(shouldAutoClickMore(""), false);
+});
+
+test("normalizeDisplayName: collapses extra whitespace", () => {
+  assert.equal(normalizeDisplayName("  横田   順平 "), "横田 順平");
+  assert.equal(normalizeDisplayName(""), "");
+});
+
+test("isOwnPost: matches normalized viewer and author names", () => {
+  assert.equal(isOwnPost("横田 順平", " 横田   順平 "), true);
+  assert.equal(isOwnPost("中村 憲太朗", "横田 順平"), false);
+  assert.equal(isOwnPost("", "横田 順平"), false);
+});
+
+test("shouldAutoExpandPost: only unliked non-own posts auto expand", () => {
+  assert.equal(shouldAutoExpandPost("unliked", "中村 憲太朗", "横田 順平"), true);
+  assert.equal(shouldAutoExpandPost("unliked", "横田 順平", "横田 順平"), false);
+  assert.equal(shouldAutoExpandPost("liked", "中村 憲太朗", "横田 順平"), false);
 });
 
 test("isCloseLabel: true only for 閉じる", () => {

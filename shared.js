@@ -49,6 +49,21 @@
     return likeState === "liked";
   }
 
+  function normalizeDisplayName(name) {
+    if (typeof name !== "string") return "";
+    return name.replace(/\s+/g, " ").trim();
+  }
+
+  function isOwnPost(authorName, currentUserName) {
+    const normalizedAuthor = normalizeDisplayName(authorName);
+    const normalizedCurrentUser = normalizeDisplayName(currentUserName);
+    return normalizedAuthor.length > 0 && normalizedAuthor === normalizedCurrentUser;
+  }
+
+  function shouldAutoExpandPost(likeState, authorName, currentUserName) {
+    return shouldAutoClickMore(likeState) && !isOwnPost(authorName, currentUserName);
+  }
+
   function shouldTriggerMoreClick(likeState, labelText) {
     return shouldAutoClickMore(likeState) && isMoreLabel(labelText);
   }
@@ -63,6 +78,9 @@
     isCloseLabel,
     shouldAutoClickMore,
     shouldAutoCollapseOnLike,
+    normalizeDisplayName,
+    isOwnPost,
+    shouldAutoExpandPost,
     shouldTriggerMoreClick,
     shouldTriggerCloseClick
   };
